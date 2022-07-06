@@ -14,7 +14,7 @@ func ToRoleResponse(role dto.RoleDto) Responses.RoleResponse {
 	}
 }
 
-func ToListResponse(roles []dto.RoleDto) []Responses.RoleResponse {
+func ToRoleListResponse(roles []dto.RoleDto) []Responses.RoleResponse {
 	var roleResponses []Responses.RoleResponse
 	for _, role := range roles {
 		roleResponses = append(roleResponses, ToRoleResponse(role))

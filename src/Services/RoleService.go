@@ -100,5 +100,5 @@ func (service *RoleService) GetAll(ctx context.Context, req Requests.GetAllReque
 	if err != nil {
 		panic(exceptions.NewNotFoundError(err.Error()))
 	}
-	return helper.ToListResponse(service.RoleRepository.GetAll(ctx, tx, req))
+	return helper.ToRoleListResponse(service.RoleRepository.GetAll(ctx, tx, req))
 }
