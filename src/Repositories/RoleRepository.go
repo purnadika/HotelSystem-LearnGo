@@ -1,15 +1,12 @@
 package repositories
 
 import (
+	"HotelSystem-LearnGo/Database"
 	helper "HotelSystem-LearnGo/Helper"
-	dto "HotelSystem-LearnGo/Models/Dto"
 	"HotelSystem-LearnGo/Models/Requests"
-	"context"
-	"database/sql"
-	"errors"
-	"fmt"
+	"strconv"
 
-	"github.com/google/uuid"
+	Entity "HotelSystem-LearnGo/Entities"
 )
 
 type RoleRepository struct {
@@ -19,72 +16,49 @@ func NewRoleRepository() IRoleRepository {
 	return &RoleRepository{}
 }
 
-func (repo RoleRepository) Create(ctx context.Context, tx *sql.Tx, role dto.RoleDto) dto.RoleDto {
-	generatedId, err := uuid.NewUUID()
-	helper.PanicIfError(err)
-
-	query := "INSERT INTO role (Id, Name, Description) VALUES (?,?,?)"
-	result, err := tx.ExecContext(ctx, query, generatedId, role.Name, role.Description)
-	helper.PanicIfError(err)
-	result.RowsAffected()
-	role.Id = generatedId
+func (repo RoleRepository) Create(role Entity.Role) Entity.Role {
+	Database.Instance.Create(&role)
 	return role
 }
 
-func (repo RoleRepository) Update(ctx context.Context, tx *sql.Tx, role dto.RoleDto) dto.RoleDto {
-	query := "UPDATE role SET Name = ?, Description = ? WHERE Id = ?"
-	result, err := tx.ExecContext(ctx, query, role.Name, role.Description, role.Id.String())
-	helper.PanicIfError(err)
-	result.RowsAffected()
+func (repo RoleRepository) Update(role Entity.Role) Entity.Role {
+	result := Database.Instance.Save(&role)
+	if result.Error != nil {
+		helper.PanicIfError(result.Error)
+	}
 	return role
 }
 
-func (repo RoleRepository) Delete(ctx context.Context, tx *sql.Tx, id uuid.UUID) (string, error) {
-	query := "DELETE FROM role WHERE Id = ?"
-	result, err := tx.ExecContext(ctx, query, id)
-	helper.PanicIfError(err)
-	totalAffected, err := result.RowsAffected()
-	helper.PanicIfError(err)
-	if totalAffected == 0 {
-		return "", errors.New("No data exists for that ID : " + id.String())
-	} else {
-		return "Role deleted successfully", nil
-	}
+func (repo RoleRepository) Delete(id uint) string {
+	var role Entity.Role
+	result := Database.Instance.Delete(&role, id)
+	helper.PanicIfError(result.Error)
+	return "Role with Id [" + strconv.FormatUint(uint64(id), 5) + "] deleted successfully"
 }
 
-func (repo RoleRepository) FindByRoleName(ctx context.Context, tx *sql.Tx, roleName string) (dto.RoleDto, error) {
-	query := "SELECT * FROM role WHERE Name = ?"
-	result, err := tx.QueryContext(ctx, query, roleName)
-	helper.PanicIfError(err)
-	defer result.Close()
-
-	role := dto.RoleDto{}
-	if result.Next() {
-		err := result.Scan(&role.Id, &role.Name, &role.Description)
-		helper.PanicIfError(err)
-		return role, nil
-	} else {
-		return role, errors.New("ROLE NOT FOUND")
-	}
+func (repo RoleRepository) FindByRoleName(roleName string) Entity.Role {
+	var role Entity.Role
+	result := Database.Instance.Where("name = ?", roleName).First(&role)
+	helper.PanicIfError(result.Error)
+	return role
 }
 
-func (repo RoleRepository) GetAll(ctx context.Context, tx *sql.Tx, req Requests.GetAllRequest) []dto.RoleDto {
-	fmt.Println(req.IsDescending)
-	query := "SELECT * FROM role ORDER BY ? ASC LIMIT ?,?"
+func (repo RoleRepository) FindById(roleId uint) Entity.Role {
+	var role Entity.Role
+	result := Database.Instance.First(&role, roleId)
+	if result.Error != nil {
+		helper.PanicIfError(result.Error)
+	}
+	return role
+}
+
+func (repo RoleRepository) GetAll(req Requests.GetAllRequest) []Entity.Role {
+	var roles []Entity.Role
+	orderType := " asc"
 	if req.IsDescending {
-		query = "SELECT * FROM role ORDER BY ? DESC LIMIT ?,?"
+		orderType = " desc"
 	}
-	result, err := tx.QueryContext(ctx, query, req.OrderBy, req.Skip, req.Take)
-	helper.PanicIfError(err)
-	defer result.Close()
-
-	var roles []dto.RoleDto
-	for result.Next() {
-		role := dto.RoleDto{}
-		err := result.Scan(&role.Id, &role.Name, &role.Description)
-		fmt.Println(role.Name)
-		helper.PanicIfError(err)
-		roles = append(roles, role)
-	}
+	result := Database.Instance.Limit(req.Take).Offset(req.Skip).Order(req.OrderBy + orderType).Find(&roles)
+	helper.PanicIfError(result.Error)
 	return roles
 }

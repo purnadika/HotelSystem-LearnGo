@@ -1,18 +1,15 @@
 package repositories
 
 import (
-	dto "HotelSystem-LearnGo/Models/Dto"
+	Entity "HotelSystem-LearnGo/Entities"
 	"HotelSystem-LearnGo/Models/Requests"
-	"context"
-	"database/sql"
-
-	"github.com/google/uuid"
 )
 
 type IRoleRepository interface {
-	Create(ctx context.Context, tx *sql.Tx, role dto.RoleDto) dto.RoleDto
-	Update(ctx context.Context, tx *sql.Tx, role dto.RoleDto) dto.RoleDto
-	Delete(ctx context.Context, tx *sql.Tx, id uuid.UUID) (string, error)
-	FindByRoleName(ctx context.Context, tx *sql.Tx, roleName string) (dto.RoleDto, error)
-	GetAll(ctx context.Context, tx *sql.Tx, req Requests.GetAllRequest) []dto.RoleDto
+	Create(role Entity.Role) Entity.Role
+	Update(role Entity.Role) Entity.Role
+	Delete(id uint) string
+	FindByRoleName(roleName string) Entity.Role
+	FindById(roleName uint) Entity.Role
+	GetAll(req Requests.GetAllRequest) []Entity.Role
 }

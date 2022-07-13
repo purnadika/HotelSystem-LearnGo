@@ -1,18 +1,14 @@
 package repositories
 
 import (
-	dto "HotelSystem-LearnGo/Models/Dto"
+	Entity "HotelSystem-LearnGo/Entities"
 	"HotelSystem-LearnGo/Models/Requests"
-	"context"
-	"database/sql"
-
-	"github.com/google/uuid"
 )
 
 type IUserRepository interface {
-	Create(ctx context.Context, tx *sql.Tx, role dto.UserDto) dto.UserDto
-	Update(ctx context.Context, tx *sql.Tx, role dto.UserDto) dto.UserDto
-	Delete(ctx context.Context, tx *sql.Tx, id uuid.UUID) (string, error)
-	FindByEmail(ctx context.Context, tx *sql.Tx, email string) (dto.UserDto, error)
-	GetAll(ctx context.Context, tx *sql.Tx, req Requests.GetAllRequest) []dto.UserDto
+	Create(user Entity.User) Entity.User
+	Update(user Entity.User) Entity.User
+	Delete(id uint) (string, error)
+	FindByEmail(email string) (Entity.User, error)
+	GetAll(req Requests.GetAllRequest) []Entity.User
 }

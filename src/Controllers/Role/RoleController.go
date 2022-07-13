@@ -5,7 +5,10 @@ import (
 	"HotelSystem-LearnGo/Models/Requests"
 	"HotelSystem-LearnGo/Models/Responses"
 	"HotelSystem-LearnGo/Services"
+	"encoding/json"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -23,7 +26,7 @@ func NewRoleController(roleService Services.IRoleService) IRoleController {
 func (controller *RoleController) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	roleCreateRequest := Requests.RoleCreateRequest{}
 	helper.ReadFromRequestBody(request, &roleCreateRequest)
-	roleResponse := controller.RoleService.Create(request.Context(), roleCreateRequest)
+	roleResponse := controller.RoleService.Create(roleCreateRequest)
 	response := Responses.GeneralResponse{
 		Code:   200,
 		Status: "OK",
@@ -35,7 +38,7 @@ func (controller *RoleController) Create(writer http.ResponseWriter, request *ht
 func (controller *RoleController) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	roleUpdateRequest := Requests.RoleUpdateRequest{}
 	helper.ReadFromRequestBody(request, &roleUpdateRequest)
-	roleResponse := controller.RoleService.Update(request.Context(), roleUpdateRequest)
+	roleResponse := controller.RoleService.Update(roleUpdateRequest)
 	response := Responses.GeneralResponse{
 		Code:   200,
 		Status: "OK",
@@ -45,9 +48,10 @@ func (controller *RoleController) Update(writer http.ResponseWriter, request *ht
 }
 
 func (controller *RoleController) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	roleId := params.ByName("roleId")
-
-	roleResponse := controller.RoleService.Delete(request.Context(), roleId)
+	roleIdString := params.ByName("roleId")
+	roleId, err := strconv.ParseUint(roleIdString, 10, 32)
+	helper.PanicIfError(err)
+	roleResponse := controller.RoleService.Delete(uint(roleId))
 	response := Responses.GeneralResponse{
 		Code:   200,
 		Status: "OK",
@@ -58,7 +62,7 @@ func (controller *RoleController) Delete(writer http.ResponseWriter, request *ht
 
 func (controller *RoleController) FindByRoleName(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	roleName := params.ByName("roleName")
-	roleResponse := controller.RoleService.FindByRoleName(request.Context(), roleName)
+	roleResponse := controller.RoleService.FindByName(roleName)
 	response := Responses.GeneralResponse{
 		Code:   200,
 		Status: "OK",
@@ -70,7 +74,10 @@ func (controller *RoleController) FindByRoleName(writer http.ResponseWriter, req
 func (controller *RoleController) GetAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	getAllRequest := Requests.GetAllRequest{}
 	helper.ReadFromRequestBody(request, &getAllRequest)
-	rolesResponse := controller.RoleService.GetAll(request.Context(), getAllRequest)
+	rolesResponse := controller.RoleService.GetAll(getAllRequest)
+	jsontext, err := json.Marshal(rolesResponse)
+	helper.PanicIfError(err)
+	log.Println(string(jsontext))
 	response := Responses.GeneralResponse{
 		Code:   200,
 		Status: "OK",

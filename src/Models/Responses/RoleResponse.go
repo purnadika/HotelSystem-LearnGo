@@ -1,7 +1,11 @@
 package Responses
 
+import (
+	"gorm.io/gorm"
+)
+
 type RoleResponse struct {
-	Id          string `json:"id"`
+	gorm.Model
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }

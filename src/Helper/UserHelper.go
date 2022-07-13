@@ -1,14 +1,14 @@
 package helper
 
 import (
-	dto "HotelSystem-LearnGo/Models/Dto"
+	Entity "HotelSystem-LearnGo/Entities"
 	"HotelSystem-LearnGo/Models/Responses"
 )
 
-func ToUserResponse(user dto.UserDto) Responses.UserResponse {
+func ToUserResponse(user Entity.User) Responses.UserResponse {
 
 	return Responses.UserResponse{
-		Id:        user.Id.String(),
+		Id:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
 		Password:  user.Password,
@@ -18,7 +18,7 @@ func ToUserResponse(user dto.UserDto) Responses.UserResponse {
 	}
 }
 
-func ToUserListResponse(users []dto.UserDto) []Responses.UserResponse {
+func ToUserListResponse(users []Entity.User) []Responses.UserResponse {
 	var userResponses []Responses.UserResponse
 	for _, user := range users {
 		userResponses = append(userResponses, ToUserResponse(user))
