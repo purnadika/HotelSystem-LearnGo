@@ -1,7 +1,9 @@
 package Requests
 
+import "gorm.io/gorm"
+
 type UserUpdateRequest struct {
-	Id          string   `validate:"required" json:"id"`
+	gorm.Model
 	Name        string   `validate:"required" json:"name"`
 	Email       string   `validate:"required" json:"email"`
 	Password    string   `validate:"required" json:"password"`

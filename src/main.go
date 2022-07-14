@@ -2,7 +2,7 @@ package main
 
 import (
 	app "HotelSystem-LearnGo/App"
-	controller "HotelSystem-LearnGo/Controllers/Role"
+	controller "HotelSystem-LearnGo/Controllers"
 	Database "HotelSystem-LearnGo/Database"
 	helper "HotelSystem-LearnGo/Helper"
 	"HotelSystem-LearnGo/Middleware"
@@ -20,13 +20,20 @@ func main() {
 	Database.Migrate()
 	validate := validator.New()
 
+	//Role
 	roleRepository := repositories.NewRoleRepository()
+	buildingRepository := repositories.NewBuildingRepository()
+	userRepository := repositories.NewUserRepository()
 	roleService := Services.NewRoleService(roleRepository, validate)
+	buildingService := Services.NewBuildingService(buildingRepository, validate)
+	userService := Services.NewUserService(userRepository, validate, roleService, buildingService)
 	roleController := controller.NewRoleController(roleService)
-	router := app.RoleRouter(roleController)
+	buildingController := controller.NewBuildingController(buildingService)
+	userController := controller.NewUserController(userService)
+	roleRouter := app.Initialize(roleController, buildingController, userController)
 	server := http.Server{
 		Addr:    "localhost:3000",
-		Handler: Middleware.NewAuthMiddleware(router),
+		Handler: Middleware.NewAuthMiddleware(roleRouter),
 	}
 
 	err := server.ListenAndServe()

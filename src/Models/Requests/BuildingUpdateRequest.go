@@ -1,7 +1,7 @@
 package Requests
 
 type BuildingUpdateRequest struct {
-	Id          string `validate:"required" json:"id"`
+	Id          uint   `validate:"required" json:"id"`
 	Name        string `validate:"required" json:"name"`
 	Address     string `json:"address"`
 	Description string `json:"description"`

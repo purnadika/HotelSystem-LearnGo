@@ -3,7 +3,6 @@ package Services
 import (
 	helper "HotelSystem-LearnGo/Helper"
 	"HotelSystem-LearnGo/Models/Requests"
-	"HotelSystem-LearnGo/Models/Responses"
 	repositories "HotelSystem-LearnGo/Repositories"
 	"encoding/json"
 	"log"
@@ -25,7 +24,7 @@ func NewRoleService(repo repositories.IRoleRepository, validate *validator.Valid
 	}
 }
 
-func (service *RoleService) Create(req Requests.RoleCreateRequest) Responses.RoleResponse {
+func (service *RoleService) Create(req Requests.RoleCreateRequest) Entity.Role {
 	err := service.Validate.Struct(req)
 	helper.PanicIfError(err)
 
@@ -35,10 +34,10 @@ func (service *RoleService) Create(req Requests.RoleCreateRequest) Responses.Rol
 	}
 
 	role = service.RoleRepository.Create(role)
-	return helper.ToRoleResponse(role)
+	return role
 }
 
-func (service *RoleService) Update(req Requests.RoleUpdateRequest) Responses.RoleResponse {
+func (service *RoleService) Update(req Requests.RoleUpdateRequest) Entity.Role {
 	err := service.Validate.Struct(req)
 	helper.PanicIfError(err)
 	currentRole := service.RoleRepository.FindById(req.Id)
@@ -49,7 +48,7 @@ func (service *RoleService) Update(req Requests.RoleUpdateRequest) Responses.Rol
 	}
 
 	role = service.RoleRepository.Update(role)
-	return helper.ToRoleResponse(role)
+	return role
 }
 
 func (service *RoleService) Delete(id uint) string {
@@ -57,18 +56,18 @@ func (service *RoleService) Delete(id uint) string {
 	return message
 }
 
-func (service *RoleService) FindByName(name string) Responses.RoleResponse {
+func (service *RoleService) FindByName(name string) Entity.Role {
 	role := service.RoleRepository.FindByRoleName(name)
-	return helper.ToRoleResponse(role)
+	return role
 }
-func (service *RoleService) FindById(id uint) Responses.RoleResponse {
+func (service *RoleService) FindById(id uint) Entity.Role {
 	role := service.RoleRepository.FindById(id)
-	return helper.ToRoleResponse(role)
+	return role
 }
 
-func (service *RoleService) GetAll(req Requests.GetAllRequest) []Responses.RoleResponse {
+func (service *RoleService) GetAll(req Requests.GetAllRequest) []Entity.Role {
 	reqString, err := json.Marshal(req)
 	helper.PanicIfError(err)
 	log.Println("Request " + string(reqString))
-	return helper.ToRoleListResponse(service.RoleRepository.GetAll(req))
+	return service.RoleRepository.GetAll(req)
 }

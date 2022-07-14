@@ -1,18 +1,22 @@
 package Services
 
 import (
+	Entity "HotelSystem-LearnGo/Entities"
 	"HotelSystem-LearnGo/Models/Requests"
-	"HotelSystem-LearnGo/Models/Responses"
 )
 
 type IUserService interface {
-	Create(req Requests.UserCreateRequest) Responses.UserResponse
-	Update(req Requests.UserUpdateRequest) Responses.UserResponse
-	Delete(uuidString string) string
-	FindByEmail(email string) Responses.UserResponse
-	GetAll(request Requests.GetAllRequest) []Responses.UserResponse
-	AssignRolesToUser(userId string, roleIds []string) bool
-	RemoveRolesFromUser(userId string, roleIds []string) bool
-	AssignBuildingsToUser(userId string, buildingIds []string) bool
-	RemoveBuildingsFromUser(userId string, buildingIds []string) bool
+	Create(req Requests.UserCreateRequest) Entity.User
+	Update(req Requests.UserUpdateRequest) Entity.User
+	Delete(id uint) string
+	FindByEmail(email string) Entity.User
+	FindByUsername(username string) Entity.User
+	FindById(id uint) Entity.User
+	GetAll(request Requests.GetAllRequest) []Entity.User
+	AssignRolesToUser(userId uint, roleIds []uint) Entity.User
+	RemoveRolesFromUser(userId uint, roleIds []uint) Entity.User
+	AssignBuildingsToUser(userId uint, buildingIds []uint) Entity.User
+	RemoveBuildingsFromUser(userId uint, buildingIds []uint) Entity.User
+	RemoveAllRolesFromUser(userId uint) Entity.User
+	RemoveAllBuildingsFromUser(userId uint) Entity.User
 }

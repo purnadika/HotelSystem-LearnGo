@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -49,8 +48,7 @@ func (controller *RoleController) Update(writer http.ResponseWriter, request *ht
 
 func (controller *RoleController) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	roleIdString := params.ByName("roleId")
-	roleId, err := strconv.ParseUint(roleIdString, 10, 32)
-	helper.PanicIfError(err)
+	roleId := helper.StringToUint(roleIdString)
 	roleResponse := controller.RoleService.Delete(uint(roleId))
 	response := Responses.GeneralResponse{
 		Code:   200,

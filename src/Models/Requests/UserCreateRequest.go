@@ -1,10 +1,11 @@
 package Requests
 
 type UserCreateRequest struct {
-	Name        string   `json:"name"`
-	Email       string   `json:"description"`
-	Password    string   `json:"password"`
-	RoleIds     []string `json:"roleIds"`
-	Address     string   `json:"address"`
-	BuildingIDs []string `json:"buildingIds"`
+	Name        string `validate:"required" json:"name"`
+	Email       string `validate:"required" json:"email"`
+	Password    string `validate:"required" json:"password"`
+	RoleIds     []uint `validate:"required" json:"roleIds"`
+	Address     string `validate:"required" json:"address"`
+	BuildingIDs []uint `validate:"required" json:"buildingIds"`
+	Username    string `validate:"required" json:"username"`
 }
