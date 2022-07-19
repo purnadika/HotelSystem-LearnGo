@@ -1,10 +1,10 @@
 package Services
 
 import (
+	exceptions "HotelSystem-LearnGo/Exceptions"
 	helper "HotelSystem-LearnGo/Helper"
 	"HotelSystem-LearnGo/Models/Requests"
 	repositories "HotelSystem-LearnGo/Repositories"
-	"encoding/json"
 	"log"
 
 	Entity "HotelSystem-LearnGo/Entities"
@@ -33,41 +33,54 @@ func (service *BuildingService) Create(req Requests.BuildingCreateRequest) Entit
 		Description: req.Description,
 	}
 
-	building = service.BuildingRepository.Create(building)
+	building, err = service.BuildingRepository.Create(building)
+	helper.PanicIfError(err)
 	return building
 }
 
 func (service *BuildingService) Update(req Requests.BuildingUpdateRequest) Entity.Building {
 	err := service.Validate.Struct(req)
 	helper.PanicIfError(err)
-	currentBuilding := service.BuildingRepository.FindById(req.Id)
+	currentBuilding, err := service.BuildingRepository.FindById(req.Id)
+	if err != nil {
+		exceptions.NewNotFoundError(err.Error())
+	}
 	building := Entity.Building{
 		Model:       currentBuilding.Model,
 		Name:        req.Name,
 		Description: req.Description,
 	}
 
-	building = service.BuildingRepository.Update(building)
+	building, err = service.BuildingRepository.Update(building)
+	helper.PanicIfError(err)
 	return building
 }
 
 func (service *BuildingService) Delete(id uint) string {
-	message := service.BuildingRepository.Delete(id)
+	message, err := service.BuildingRepository.Delete(id)
+	helper.PanicIfError(err)
 	return message
 }
 
 func (service *BuildingService) FindByName(name string) Entity.Building {
-	building := service.BuildingRepository.FindByBuildingName(name)
+	building, err := service.BuildingRepository.FindByBuildingName(name)
+	if err != nil {
+		exceptions.NewNotFoundError(err.Error())
+	}
 	return building
 }
 func (service *BuildingService) FindById(id uint) Entity.Building {
-	building := service.BuildingRepository.FindById(id)
+	building, err := service.BuildingRepository.FindById(id)
+	if err != nil {
+		exceptions.NewNotFoundError(err.Error())
+	}
 	return building
 }
 
 func (service *BuildingService) GetAll(req Requests.GetAllRequest) []Entity.Building {
-	reqString, err := json.Marshal(req)
-	helper.PanicIfError(err)
+	reqString := helper.SerializeObject(req)
 	log.Println("Request " + string(reqString))
-	return service.BuildingRepository.GetAll(req)
+	result, err := service.BuildingRepository.GetAll(req)
+	helper.PanicIfError(err)
+	return result
 }

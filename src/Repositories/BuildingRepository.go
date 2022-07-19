@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"HotelSystem-LearnGo/Database"
-	helper "HotelSystem-LearnGo/Helper"
 	"HotelSystem-LearnGo/Models/Requests"
 	"strconv"
 
@@ -16,49 +15,40 @@ func NewBuildingRepository() IBuildingRepository {
 	return &BuildingRepository{}
 }
 
-func (repo BuildingRepository) Create(building Entity.Building) Entity.Building {
-	Database.Instance.Create(&building)
-	return building
+func (repo BuildingRepository) Create(building Entity.Building) (Entity.Building, error) {
+	result := Database.Instance.Create(&building)
+	return building, result.Error
 }
 
-func (repo BuildingRepository) Update(building Entity.Building) Entity.Building {
+func (repo BuildingRepository) Update(building Entity.Building) (Entity.Building, error) {
 	result := Database.Instance.Save(&building)
-	if result.Error != nil {
-		helper.PanicIfError(result.Error)
-	}
-	return building
+	return building, result.Error
 }
 
-func (repo BuildingRepository) Delete(id uint) string {
+func (repo BuildingRepository) Delete(id uint) (string, error) {
 	var building Entity.Building
 	result := Database.Instance.Delete(&building, id)
-	helper.PanicIfError(result.Error)
-	return "Building with Id [" + strconv.FormatUint(uint64(id), 5) + "] deleted successfully"
+	return "Building with Id [" + strconv.FormatUint(uint64(id), 5) + "] deleted successfully", result.Error
 }
 
-func (repo BuildingRepository) FindByBuildingName(buildingName string) Entity.Building {
+func (repo BuildingRepository) FindByBuildingName(buildingName string) (Entity.Building, error) {
 	var building Entity.Building
 	result := Database.Instance.Where("name = ?", buildingName).First(&building)
-	helper.PanicIfError(result.Error)
-	return building
+	return building, result.Error
 }
 
-func (repo BuildingRepository) FindById(buildingId uint) Entity.Building {
+func (repo BuildingRepository) FindById(buildingId uint) (Entity.Building, error) {
 	var building Entity.Building
 	result := Database.Instance.First(&building, buildingId)
-	if result.Error != nil {
-		helper.PanicIfError(result.Error)
-	}
-	return building
+	return building, result.Error
 }
 
-func (repo BuildingRepository) GetAll(req Requests.GetAllRequest) []Entity.Building {
+func (repo BuildingRepository) GetAll(req Requests.GetAllRequest) ([]Entity.Building, error) {
 	var buildings []Entity.Building
 	orderType := " asc"
 	if req.IsDescending {
 		orderType = " desc"
 	}
 	result := Database.Instance.Limit(req.Take).Offset(req.Skip).Order(req.OrderBy + orderType).Find(&buildings)
-	helper.PanicIfError(result.Error)
-	return buildings
+	return buildings, result.Error
 }

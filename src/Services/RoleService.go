@@ -1,6 +1,7 @@
 package Services
 
 import (
+	exceptions "HotelSystem-LearnGo/Exceptions"
 	helper "HotelSystem-LearnGo/Helper"
 	"HotelSystem-LearnGo/Models/Requests"
 	repositories "HotelSystem-LearnGo/Repositories"
@@ -33,35 +34,45 @@ func (service *RoleService) Create(req Requests.RoleCreateRequest) Entity.Role {
 		Description: req.Description,
 	}
 
-	role = service.RoleRepository.Create(role)
+	role, err = service.RoleRepository.Create(role)
+	helper.PanicIfError(err)
 	return role
 }
 
 func (service *RoleService) Update(req Requests.RoleUpdateRequest) Entity.Role {
 	err := service.Validate.Struct(req)
 	helper.PanicIfError(err)
-	currentRole := service.RoleRepository.FindById(req.Id)
+	currentRole, err := service.RoleRepository.FindById(req.Id)
+	helper.PanicIfError(err)
 	role := Entity.Role{
 		Model:       currentRole.Model,
 		Name:        req.Name,
 		Description: req.Description,
 	}
 
-	role = service.RoleRepository.Update(role)
+	role, err = service.RoleRepository.Update(role)
+	helper.PanicIfError(err)
 	return role
 }
 
 func (service *RoleService) Delete(id uint) string {
-	message := service.RoleRepository.Delete(id)
+	message, err := service.RoleRepository.Delete(id)
+	helper.PanicIfError(err)
 	return message
 }
 
 func (service *RoleService) FindByName(name string) Entity.Role {
-	role := service.RoleRepository.FindByRoleName(name)
+	role, err := service.RoleRepository.FindByRoleName(name)
+	if err != nil {
+		exceptions.NewNotFoundError(err.Error())
+	}
 	return role
 }
 func (service *RoleService) FindById(id uint) Entity.Role {
-	role := service.RoleRepository.FindById(id)
+	role, err := service.RoleRepository.FindById(id)
+	if err != nil {
+		exceptions.NewNotFoundError(err.Error())
+	}
 	return role
 }
 
@@ -69,5 +80,7 @@ func (service *RoleService) GetAll(req Requests.GetAllRequest) []Entity.Role {
 	reqString, err := json.Marshal(req)
 	helper.PanicIfError(err)
 	log.Println("Request " + string(reqString))
-	return service.RoleRepository.GetAll(req)
+	result, err := service.RoleRepository.GetAll(req)
+	helper.PanicIfError(err)
+	return result
 }

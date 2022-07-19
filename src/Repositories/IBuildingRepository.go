@@ -6,10 +6,10 @@ import (
 )
 
 type IBuildingRepository interface {
-	Create(building Entity.Building) Entity.Building
-	Update(building Entity.Building) Entity.Building
-	Delete(id uint) string
-	FindByBuildingName(buildingName string) Entity.Building
-	FindById(id uint) Entity.Building
-	GetAll(req Requests.GetAllRequest) []Entity.Building
+	Create(building Entity.Building) (Entity.Building, error)
+	Update(building Entity.Building) (Entity.Building, error)
+	Delete(id uint) (string, error)
+	FindByBuildingName(buildingName string) (Entity.Building, error)
+	FindById(id uint) (Entity.Building, error)
+	GetAll(req Requests.GetAllRequest) ([]Entity.Building, error)
 }
